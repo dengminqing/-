@@ -1,0 +1,91 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+<p>
+    <label>选择框</label>
+    <input type="checkbox" class="j-input" data-id="1"/>
+</p>
+<p>
+    <label>选择框</label>
+    <input type="checkbox" class="j-input" data-id = "2"/>
+</p>
+<p>
+    <label>选择框</label>
+    <input type="checkbox" class="j-input" data-id="3"/>
+</p>
+<p>
+    <label>选择框</label>
+    <input type="checkbox" class="j-input" data-id = "4"/>
+</p>
+
+<script type="text/javascript">
+/*
+下面我们通过虚拟代理的方式，延迟2秒，在2秒后获取所有被选中的复选框的按钮id，一次性给服务器发请求。
+
+  通过点击页面的复选框，选中的时候增加一个属性isflag，没有选中的时候删除该属性isflag，然后延迟个2秒，在2秒后重新判断页面上所有复选框中有isflag的属性上的id，存入数组，然后代理函数调用本体函数的方法，把延迟2秒后的所有id一次性发给本体方法，本体方法可以获取所有的id，可以向服务器端发送ajax请求，这样的话，服务器的请求压力相对来说减少了
+*/ 
+	var mainFunc = function(ids){
+		console.log(ids);
+	};
+
+	var proxyFunc = (function(){
+		var cache = [],//保存id
+			time = null;
+		return function(checkeds){
+			if(time){
+				return;
+			};
+
+			time = setTimeout(function(){
+				for(var i = 0,len = checkeds.length;i<len;i+=1){
+					if(checkeds[i].hasAttributes("isflag")){
+						var id =checkeds[i].getAttribute("data-id");						
+						cache[cache.length] = id;
+	
+					}
+				}
+				mainFunc(cache.join(","));
+				clearTimeout(time);
+				cache =[];
+			},2000)
+		}
+	})();
+
+
+	var checkboxs = document.getElementsByClassName("j-input");
+	for(var i =0,ilen = checkboxs.length;i<ilen;i+=1){		
+		(function(i){
+			checkboxs[i].onclick = function(){
+				if(this.checked){
+					this.setAttribute("isflag", 1);
+				}else{
+					this.removeAttribute("isflag");
+				}
+				proxyFunc(checkboxs);
+			}
+		})(i);		
+	}
+
+	function shuffle(arr) {
+	    var i, 
+	        j,
+	        temp;
+	    for (i = arr.length - 1; i > 0; i--) {
+	        j = Math.floor(Math.random() * (i + 1));
+	        temp = arr[i];
+	        arr[i] = arr[j];
+	        arr[j] = temp;
+	    }
+	    return arr;    
+	};
+	var a = [1, 2, 3, 4, 5, 6, 7, 8];
+	var b = shuffle(a);
+	console.log(b);
+</script>
+</body>
+
+</html>

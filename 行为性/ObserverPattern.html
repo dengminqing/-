@@ -1,0 +1,101 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+<p>观察者模式----它定义了对象间的一种一对多的关系，让多个观察者对象同时监听某一个主题对象，当一个对象发生改变时，所有依赖于它的对象都将得到通知</p>
+<p>1. 支持简单的广播通信，当对象状态发生改变时，会自动通知已经订阅过的对象:比如上面的列子，小明，小红不需要天天逛淘宝网看鞋子到了没有，在合适的时间点，发布者(卖家)来货了的时候，会通知该订阅者(小红，小明等人)</p>
+<p>2.发布者与订阅者耦合性降低，发布者只管发布一条消息出去，它不关心这条消息如何被订阅者使用，同时，订阅者只监听发布者的事件名，只要发布者的事件名不变，它不管发布者如何改变</p>
+<p>同理卖家（发布者）它只需要将鞋子来货的这件事告诉订阅者(买家)，他不管买家到底买还是不买，还是买其他卖家的。只要鞋子到货了就通知订阅者即可</p>
+<p>我们日常工作中也经常使用到，比如我们的ajax请求，请求有成功(success)和失败(error)的回调函数，我们可以订阅ajax的success和error事件。我们并不关心对象在异步运行的状态，我们只关心success的时候或者error的时候我们要做点我们自己的事情就可以了~</p>
+<script type="text/javascript">	
+/*
+2. 如何实现发布–订阅模式？
+
+   1. 首先要想好谁是发布者(比如上面的卖家)。
+
+   2. 然后给发布者添加一个缓存列表，用于存放回调函数来通知订阅者(比如上面的买家收藏了卖家的店铺，卖家通过收藏了该店铺的一个列表名单)。
+
+   3. 最后就是发布消息，发布者遍历这个缓存列表，依次触发里面存放的订阅者回调函数。
+*/ 
+	//增加订阅者
+	var shoeObj = {};//发布者
+
+	shoeObj.list = [];//缓存列表，存放订阅者回调函数
+
+	shoeObj.listen = function(fn){
+		shoeObj.list.push(fn);//订阅消息添加到缓存列表
+	};
+
+	//发布消息
+	shoeObj.trigger = function(){
+		for(var i = 0,fn;fn =this.list[i++];){
+			fn.apply(this,arguments);
+		}		
+	};
+
+
+
+	//小红订阅了消息
+	shoeObj.listen(function(color,size){
+		console.log("颜色是："+color);
+		console.log("尺寸是："+size);
+	});
+
+	shoeObj.listen(function(color,size){
+		console.log("再次打印颜色是："+color);
+		console.log("再次打印尺寸是："+size);
+	});
+
+	shoeObj.trigger("红色",40)
+	shoeObj.trigger("黑色",42)
+</script>
+
+<script type="text/javascript">
+	//她只想接收颜色为红色的消息，不想接收颜色为黑色的消息，为此我们需要对代码进行如下改造下，我们可以先增加一个key，使订阅者只订阅自己感兴趣的消息
+
+	var  shoeObj = {};
+	shoeObj.list = [];	
+	shoeObj.listen = function(key,fn){				
+		if(!this.list[key]){
+			// 如果还没有订阅过此类消息，给该类消息创建一个缓存列表
+			this.list[key] = [];
+		}		
+		this.list[key].push(fn);
+	};
+	//发布消息
+	shoeObj.trigger = function(){
+		var key = Array.prototype.shift.call(arguments);//取出消息类型名称		
+		var fns = this.list[key];//取出改消息对应的回调函数集合		
+		//如果没有订阅过该消息的话，返回
+		if(!fns || fns.length === 0){
+			return;
+		}
+		for(var i = 0,fn; fn =fns[i++];){
+			fn.apply(this,arguments);
+		};
+	};
+
+	shoeObj.listen("red",function(size){
+		console.log("尺码是:"+size);
+	});
+
+	shoeObj.listen("block",function(size){
+		console.log("尺再次码是："+size);
+	});
+
+	shoeObj.trigger("red",40);
+	shoeObj.trigger("block",42);
+
+	var txt="Hello world!"
+document.write(txt.anchor("myanchor"))
+
+</script>
+<script type="text/javascript">
+	var obj =["1","2"];
+	console.log(obj["1"])
+</script>
+</body>
+</html>

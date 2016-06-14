@@ -1,0 +1,83 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+<button id="button1">刷新菜单目录</button>
+<button id="button2">增加子菜单</button>
+<button id="button3">删除子菜单</button>
+<!-- 传统的面向对象模式来设计代码 -->
+<script type="text/javascript">
+	/*
+	
+	*/ 
+	var b1 = document.getElementById("button1"),
+		b2 = document.getElementById("button2"),
+		b3 = document.getElementById("button3");
+	// 定义setCommand 函数，该函数负责往按钮上面安装命令。点击按钮后会执行command对象的execute()方法。
+	var setCommand = function(button,command){
+		button.onclick = function(){
+			command.execute();
+		}
+	};
+
+	var MenuBar = {
+		refersh:function(){
+			alert("刷新菜单目录")
+		}
+	};
+	//下面我们自己来定义各个对象来完成自己的业务操作
+	var SubMenu = {
+		add:function(){
+			alert("增加子菜单")
+		},
+		del:function(){
+			alert("删除子菜单")
+		}
+	};
+
+	//编写命令类
+	var RefershMeunBarCommand = function(receiver){
+		this.receiver = receiver;
+	};
+
+	RefershMeunBarCommand.prototype.execute = function(){
+		this.receiver.refersh();
+	};
+
+	//增加命令操作
+	var AddSubMenuCommand = function(receiver){
+		this.receiver = receiver;
+	};
+	AddSubMenuCommand.prototype.execute =function(){
+		this.receiver.add();
+	};
+	//删除命令操作
+	var DelSubMenuCommand = function(receiver){
+		this.receiver = receiver;
+	};
+
+	DelSubMenuCommand.prototype.execute =function(){
+		this.receiver.del();
+	};
+	// 最后把命令接收者传入到command对象中，并且把command对象安装到button上面
+	var refershBtn = new RefershMeunBarCommand(MenuBar);
+	var addBtn = new AddSubMenuCommand(SubMenu);
+	var delBtn = new DelSubMenuCommand(SubMenu);
+
+	setCommand(b1,refershBtn);
+	setCommand(b2,addBtn);
+	setCommand(b3,delBtn);
+	/*
+	任何一个操作都有一个execute这个方法来执行操作,使用传统的面向对象编程来实现命令模式的，命令模式过程式的请求调用封装在command对象的execute方法里
+	我们可以使用javascript中的回调函数来做这些事情的，在面向对象中，命令模式的接收者被当成command对象的属性保存起来，
+	同时约定执行命令的操作调用command.execute方法，
+	但是如果我们使用回调函数的话，那么接收者被封闭在回调函数产生的环境中，
+	执行操作将会更加简单，仅仅执行回调函数即可
+	*/
+
+</script>
+</body>
+</html>

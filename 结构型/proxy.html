@@ -1,0 +1,59 @@
+<!DOCTYPE Html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript">
+	//比如现在京东ceo想送给奶茶妹一个礼物，但是呢假如该ceo不好意思送，或者由于工作忙没有时间送，那么这个时候他就想委托他的经纪人去做这件事
+
+	// 先申明一个奶茶妹对象
+	var TeaAndMilkGril = function(name){
+		this.name = name;
+	};
+	// 这是京东ceo先生
+	var Ceo = function(gril){
+		this.gril = gril;
+		// 送结婚礼物 给奶茶妹
+		this.sendMarriagering = function(ring){
+			console.log("HI " + this.gril.name + ", ceo送你一个礼物: "+ring)
+		}
+	};
+	// 京东ceo的经纪人是代理，来代替送
+	var ProxyObj = function(gril){
+		this.gril = gril;
+		// 经纪人代理送礼物给奶茶妹
+		this.sendGift =function(gift){
+			// 代理模式负责本体对象实例化
+			(new Ceo(this.gril)).sendMarriagering(gift);
+		};
+	}
+	//实例化
+	var proxy = new ProxyObj(new TeaAndMilkGril("奶茶妹"));
+	proxy.sendGift("结婚戒")
+
+	/*
+	代码如上的基本结构，TeaAndMilkGirl 是一个被送的对象(这里是奶茶妹)；
+	Ceo 是送礼物的对象，他保存了奶茶妹这个属性，及有一个自己的特权方法sendMarriageRing 就是送礼物给奶茶妹这么一个方法；
+	然后呢他是想通过他的经纪人去把这件事完成，于是需要创建一个经济人的代理模式，名字叫ProxyObj ；
+	他的主要做的事情是，把ceo交给他的礼物送给ceo的情人，因此该对象同样需要保存ceo情人的对象作为自己的属性，同时也需要一个特权方法sendGift ，该方法是送礼物，
+	因此在该方法内可以实例化本体对象，这里的本体对象是ceo送花这件事情，因此需要实例化该本体对象后及调用本体对象的方法(sendMarriageRing).
+	*/
+</script>
+</head>
+<body>
+	<P>
+		 代理是一个对象，它可以用来控制对本体对象的访问，它与本体对象实现了同样的接口，代理对象会把所有的调用方法传递给本体对象的；
+	</P>
+	<P>
+		代理模式最基本的形式是对访问进行控制，而本体对象则负责执行所分派的那个对象的函数或者类
+	</P>
+	<P>
+		简单的来讲本地对象注重的去执行页面上的代码，代理则控制本地对象何时被实例化，何时被使用；
+	</P>
+	<h1>代理的优点：</h1>
+	<P>
+		代理对象可以代替本体被实例化，并使其可以被远程访问；
+		它还可以把本体实例化推迟到真正需要的时候；对于实例化比较费时的本体对象，或者因为尺寸比较大以至于不用时不适于保存在内存中的本体，我们可以推迟实例化该对象；
+	</P>
+</body>
+</html>

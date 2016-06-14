@@ -1,0 +1,250 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+	<p>中介者模式</p>
+	<p>中介者模式的作用是解除对象与对象之间的耦合关系，增加一个中介对象后，所有的相关对象都通过中介者对象来通信，而不是相互引用</p>
+	<p>所以当一个对象发送改变时，只需要通知中介者对象即可。中介者使各个对象之间耦合松散，而且可以独立地改变它们之间的交互</p>
+
+<script type="text/javascript">	
+	/*
+	使用中介者模式用法：
+	1.首先我们仍然定义Hero构造函数和Hero对象原型的方法，在Hero对象的这些原型方法中，不再负责具体的执行的逻辑；
+	2.而是把操作转交给中介者对象，中介者对象来负责做具体的事情，我们可以把中介者对象命名为playerDirector;
+	3.在playerDirector开放一个对外暴露的接口ReceiveMessage，负责接收player对象发送的消息
+	4.而player对象发送消息的时候，总是把自身的this作为参数发送给playerDirector，以便playerDirector 识别消息来自于那个玩家对象
+	*/ 
+
+	// var players = [];//保存所有玩家
+	function Hero(name,teamColor){
+		this.state ='live';//玩家状态
+		this.name = name;//玩家名字
+		this.teamColor = teamColor;//队伍颜色
+	};
+
+	Hero.prototype.win = function(){
+		console.log("win:"+this.name);
+	};
+	
+	Hero.prototype.lose = function(){
+		console.log("lose:"+this.name);
+	};
+
+	Hero.prototype.die = function(){
+		this.state ='dead';//设置输了玩家死亡
+		//给中介者发送消息，玩家死亡	
+		playerDirector.ReceiveMessage('playerDead',this);	
+	};
+
+	Hero.prototype.remove = function(){
+		//给中介者发送消息，移除玩家		
+		playerDirector.ReceiveMessage('removePlayer',this);
+	};
+
+	Hero.prototype.changeTeam = function(color){
+		//给中介者发送消息，玩家换队
+		playerDirector.ReceiveMessage('changeTeam',this,color)
+	};
+
+	//定义工厂类来创建玩家
+	var heroFactory = function(name,teamColor){
+		//创建一个新的玩家对象
+		var newPlays = new Hero(name,teamColor);
+		//给中介者发送消息，新增玩家
+		playerDirector.ReceiveMessage('addPlayer',newPlays);
+		return newPlays;
+	};
+
+	/*
+		由于工厂类heroFactory直接对hero进行实例化并赋值，
+		因此，中介者对象playerDirector的操作方法可以直接获取hero的属性或者对象
+	*/ 
+	//中介者对象来负责做具体的事情，开放一个对外暴露的接口ReceiveMessage，负责接收player对象发送的消息
+	var playerDirector =(function(){
+		var players = {},//保存所有玩家
+			operations ={};//中介者可以执行操作
+		operations.addPlayer = function(player){
+			//获取玩家队友颜色
+			var teamColor = player.teamColor;
+			//如果该颜色的玩家还没有队伍，则新成立一个队伍
+			players[teamColor] = players[teamColor] || [];			
+			//添加玩家进队伍
+			players[teamColor].push(player);	
+		};
+		//移除玩家
+		operations.removePlayer = function(player){
+			var teamColor = player.teamColor,
+				teamPlayers = players[teamColor] || [];
+			//遍历队伍所有成员
+			for(var i = teamPlayers.length - 1 ; i>=0;i--){
+				if(teamPlayers[i] === player){
+					teamPlayers.splice(i,1);
+				}
+			}
+		};
+		//玩家换队
+		operations.changeTeam = function(player,newTeamColor){
+			//首先从员队伍中删除
+			operations.removePlayer(player);
+			//然后改变队伍的颜色
+			player.teamColor = newTeamColor;
+			//增加到队伍
+			operations.addPlayer(player);
+		};
+
+		//玩家死亡
+		operations.playerDead = function(player){
+			var teamColor  = player.teamColor,
+				teamPlayers = players[teamColor];
+			var all_dead = true;
+			for(var i = 0; player = teamPlayers[i++];){
+				if(player.state !== 'dead'){
+					all_dead = false;
+					break;
+				}
+			}
+
+			if(all_dead){
+				for(var i =0;player = teamPlayers[i++];){
+					//本队所有玩家lose
+					player.lose();
+				};
+				for(var color in players){
+					if(color !== teamColor){
+						// 说明这是另外一组队伍
+                		// 获取该队伍的玩家
+                		var teamPlayers = players[color];
+                		for(var i =0;player = teamPlayers[i++];){
+                			player.win();
+                		}
+					}
+				};
+			}
+		};
+
+		var ReceiveMessage = function(){
+			var message  =Array.prototype.shift.call(arguments);
+			operations[message].apply(this,arguments);
+		};	
+		//开放一个对外暴露的接口ReceiveMessage，负责接收player对象发送的消息
+		return {
+			ReceiveMessage :ReceiveMessage
+		}
+	})();
+	// 红队
+	var p1 = heroFactory("aa",'red'),
+    	p2 = heroFactory("bb",'red'),
+    	p3 = heroFactory("cc",'red'),
+        p4 = heroFactory("dd",'red');
+ 
+    // 蓝队
+    var p5 = heroFactory("ee",'blue'),
+        p6 = heroFactory("ff",'blue'),
+        p7 = heroFactory("gg",'blue'),
+        p8 = heroFactory("hh",'blue');
+    // 让红队玩家全部死亡
+    p1.die();
+    p2.die();
+    p3.die();
+    p4.die();
+    // lose:aa lose:bb lose:cc lose:dd 
+   // win:ee win:ff win:gg win:hh
+</script>
+<script type="text/javascript">
+	function Hero(name,teamColor){
+		this.name = name;
+		this.teamColor = teamColor;
+		this.state = 'live';		
+	};
+
+	Hero.prototype.win = function(){
+		console.log("win---"+this.name);
+	};
+
+	Hero.prototype.lose = function(){
+		console.log("lose---"+this.name);
+	};
+
+	Hero.prototype.die = function(){
+		this.state ='dead';//玩家死亡
+		playerDirector.ReceiveMessage("playDead",this);
+	};
+
+	//创建工厂类创建玩家,负责hero实例化
+	var heroFactory = function(name,teamColor){
+		var heroPlayer = new Hero(name,teamColor);
+		playerDirector.ReceiveMessage("addPlayer",heroPlayer);
+		return heroPlayer;
+	}
+
+
+	//中介者对象，专门负责接收player对象发送的信息
+	var playerDirector = (function(){
+		var players ={},//保存所有玩家
+			operations ={};
+		operations.addPlayer = function(player){
+			//给玩家分配队伍颜色
+			var teamColor = player.teamColor;
+			//如果该颜色没有玩家选取，则成立一个新队伍
+			players[teamColor] = players[teamColor] || [];
+			//添加玩家进队伍
+			players[teamColor].push(player);
+		};
+
+		operations.playDead = function(player){
+			var teamColor = player.teamColor,
+				teamPlayers = players[teamColor];//玩家所在队伍
+			//设置玩家所在队伍是否死亡
+			var all_dead = true;
+			for(var i = 0; player = teamPlayers[i++];){
+				if(player.state !=="dead"){
+					all_dead = false;
+					break;
+				}
+			}
+
+			if(all_dead){
+				for(var i = 0,player;player = teamPlayers[i++];){
+					player.lose();
+				};
+				for (var color in players) {
+					if(color !== teamColor){
+						var teamPlayers = players[color];
+						for (var i = 0; player = teamPlayers[i++];) {
+							player.win();
+						}
+					}
+				};
+			}
+
+		};
+
+		var ReceiveMessage = function(){			
+			var message = Array.prototype.shift.call(arguments);
+			operations[message].apply(this,arguments);
+		};
+		return {
+			ReceiveMessage:ReceiveMessage
+		}
+	})();
+
+	var p1 = heroFactory("aa","red");
+	var p2 = heroFactory("bb","red");
+	var p3 = heroFactory("cc","red");
+	var p4 = heroFactory("dd","red");
+
+
+	var p5 = heroFactory("ee","blue");
+	var p6 = heroFactory("ff","blue");
+	var p7 = heroFactory("gg","blue");
+	var p8 = heroFactory("rr","blue");
+
+	p1.win();
+
+</script>
+
+</body>
+</html>

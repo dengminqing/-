@@ -1,0 +1,38 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+	<p>中介者模式</p>
+	<p>中介者模式的作用是解除对象与对象之间的耦合关系，增加一个中介对象后，所有的相关对象都通过中介者对象来通信，而不是相互引用</p>
+	<p>所以当一个对象发送改变时，只需要通知中介者对象即可。中介者使各个对象之间耦合松散，而且可以独立地改变它们之间的交互</p>
+
+<script type="text/javascript">	
+function Hero(name) {
+	this.name = name;
+	this.enemy =null;
+}
+Hero.prototype.win = function(){
+	console.log(this.name + "Win")
+};
+
+Hero.prototype.lose = function(){
+	console.log(this.name + "lose")
+};
+
+Hero.prototype.die = function(){
+	this.lose();
+	this.enemy.win();	
+};
+var h1 = new Hero("赵云");
+var h2 = new Hero("张飞");
+console.log(h1)
+h1.enemy = h2;
+h2.enemy = h1;
+h2.die();
+</script>
+
+</body>
+</html>

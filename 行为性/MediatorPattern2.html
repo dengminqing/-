@@ -1,0 +1,107 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+	<p>中介者模式</p>
+	<p>中介者模式的作用是解除对象与对象之间的耦合关系，增加一个中介对象后，所有的相关对象都通过中介者对象来通信，而不是相互引用</p>
+	<p>所以当一个对象发送改变时，只需要通知中介者对象即可。中介者使各个对象之间耦合松散，而且可以独立地改变它们之间的交互</p>
+
+<script type="text/javascript">	
+	var players = [];// 定义一个数组 保存所有的玩家
+	function Hero(name,teamColor) {	
+		this.friends = [];    //保存队友列表
+	    this.enemies = [];    // 保存敌人列表
+	    this.state = 'live';  // 玩家状态
+	    this.name = name;     // 角色名字
+	    this.teamColor = teamColor; // 队伍的颜色
+	}
+
+	Hero.prototype.win = function(){
+		console.log("Win:"+this.name)
+	};
+
+	Hero.prototype.lose = function(){
+		console.log("lose:"+this.name )
+	};
+
+	Hero.prototype.die = function(){
+		// 所有队友死亡情况 默认都是活着的
+		var all_dead = true;
+		this.state = 'dead';// 设置玩家状态为死亡
+		for(var i = 0,len = this.friends.length; i<len;i++){
+			// 遍历，如果还有一个队友没有死亡的话，则游戏还未结束
+			if(this.friends[i].state !=='dead'){
+				all_dead = false;
+				break;
+			}
+		};
+		if(all_dead){
+			 // 队友全部死亡，游戏结束
+			this.lose();
+			// 循环 通知所有的玩家 游戏失败
+			for(var j =0,jlen = this.friends.length;j<jlen;j++){
+				this.friends[j].lose();
+			}
+			// 通知所有敌人游戏胜利
+			for(var j =0,jlen = this.enemies.length;j<jlen;j++){
+				this.enemies[j].win();
+			}
+		};
+	};
+	// 定义一个工厂类来创建玩家
+	var heroFactory = function(name,teamColor){
+		var newPlayer = new Hero(name,teamColor);
+		for(var i =0,ilen =players.length;i<ilen;i++){
+			// 如果是同一队的玩家
+			if(players[i].teamColor == newPlayer.teamColor){
+				// 相互添加队友列表
+				players[i].friends.push(newPlayer);
+				newPlayer.friends.push(players[i]);
+			}else{
+				// 相互添加到敌人列表
+				players[i].enemies.push(newPlayer);
+				newPlayer.enemies.push(players[i]);
+			}
+		}
+		players.push(newPlayer);
+		return newPlayer;
+	}
+	        // 红队
+	var p1 = heroFactory("aa",'red'),
+	    p2 = heroFactory("bb",'red'),
+	    p3 = heroFactory("cc",'red'),
+	    p4 = heroFactory("dd",'red');
+
+	// 蓝队
+	var p5 = heroFactory("ee",'blue'),
+	    p6 = heroFactory("ff",'blue'),
+	    p7 = heroFactory("gg",'blue'),
+	    p8 = heroFactory("hh",'blue');
+	// 让红队玩家全部死亡
+	p1.die();
+	p2.die();
+	p3.die();
+	p4.die();
+
+	/*
+	思路：
+	1.Hero函数有2个参数，分别是name(玩家名字)和teamColor(队颜色)
+	2.首先我们可以根据队颜色来判断是队友还是敌人；同样也有三个方法win(赢)，lose(输)，和die(死亡)；
+	3.如果每次死亡一个人的时候，循环下该死亡的队友有没有全部死亡，如果全部死亡了的话，就输了，因此需要循环他们的队友，分别告诉每个队友中的成员他们输了，同时需要循环他们的敌人，分别告诉他们的敌人他们赢了
+	4.因此每次死了一个人的时候，都需要循环一次判断他的队友是否都死亡了；因此每个玩家和其他的玩家都是紧紧耦合在一起了
+	*/ 
+
+	/*
+	使用中介者模式用法：
+	1.首先我们仍然定义Hero构造函数和Hero对象原型的方法，在Hero对象的这些原型方法中，不再负责具体的执行的逻辑；
+	2.而是把操作转交给中介者对象，中介者对象来负责做具体的事情，我们可以把中介者对象命名为playerDirector;
+	3.在playerDirector开放一个对外暴露的接口ReceiveMessage，负责接收player对象发送的消息
+	4.而player对象发送消息的时候，总是把自身的this作为参数发送给playerDirector，以便playerDirector 识别消息来自于那个玩家对象
+	*/ 
+</script>
+
+</body>
+</html>

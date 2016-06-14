@@ -1,0 +1,67 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+	<P>
+		虚拟代理用于控制对那种创建开销很大的本体访问，它会把本体的实例化推迟到有方法被调用的时候
+	</P>
+	<P>
+		在网页开发中，图片的预加载是一种比较常用的技术，如果直接给img标签节点设置src属性的话，如果图片比较大的话，或者网速相对比较慢的话，那么在图片未加载完之前，图片会有一段时间是空白的场景，这样对于用户体验来讲并不好
+	</P>
+	<p>
+		比如说现在有一个对象的实例化很慢的话，不能在网页加载的时候立即完成，我们可以为其创建一个虚拟代理，让他把该对象的实例推迟到需要的时候。
+	</P>
+
+<script type="text/javascript">
+	//那么这个时候我们可以在图片未加载完之前我们可以使用一个loading加载图片来作为一个占位符，来提示用户该图片正在加载，等图片加载完后我们可以对该图片直接进行赋值即可；
+
+	// 不使用代理的预加载图片函数如下
+	// var myImage =(function(){
+	// 	var imgNode = document.createElement("img");
+	// 	document.body.appendChild(imgNode);
+	// 	var img = new Image();
+	// 	img.onload = function(){
+	// 		imgNode.src = this.src;
+	// 	};
+	// 	return {
+	// 		setSrc : function(src){
+	// 			imgNode.src ="http://img.lanrentuku.com/img/allimg/1212/5-121204193Q9-50.gif";
+	// 			img.src = src;
+	// 		}
+	// 	}
+	// })();
+	// myImage.setSrc("https://img.alicdn.com/tps/i4/TB1b_neLXXXXXcoXFXXc8PZ9XXX-130-200.png");
+	
+	
+	var myImage = (function(){
+		var imgNode = document.createElement("img");
+		document.body.appendChild(imgNode);
+		return {
+			setSrc:function(src){
+				imgNode.src =src;
+			}
+		}
+	})();
+	//代理对象
+	var proxyObj = (function(){
+
+		var img = new Image();
+		img.onload = function(){
+			myImage.setSrc(this.src);
+		}
+		return {
+			setSrc :function(src){
+				myImage.setSrc("http://img.lanrentuku.com/img/allimg/1212/5-121204193Q9-50.gif");
+				img.src = src;
+			}
+		}
+
+	})();
+
+	proxyObj.setSrc("https://img.alicdn.com/tps/i4/TB1b_neLXXXXXcoXFXXc8PZ9XXX-130-200.png");
+</script>
+</body>
+</html>

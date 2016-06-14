@@ -1,0 +1,49 @@
+<!DOCTYPE Html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>SingletonDemo</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+</head>
+<body>
+    <button id="Id">1212</button>
+<script type="text/javascript">	
+
+//理解使用代理实现单列模式的好处 通用单体
+var createWindow = function(){
+    var div = document.createElement("div");
+    div.innerHTML ="我是弹窗内容";
+    div.style.display ="none";
+    document.body.appendChild(div);
+    return div;
+};
+
+var createIframe = function(){
+    var ifr = document.createElement("iframe");
+    document.body.appendChild(ifr);
+    return ifr;
+};
+
+var getInstance = function(fn){
+    var result;
+    return function(){
+        return result ||(result = fn.call(this,arguments));    
+    }
+}
+
+// var createSingleDiv = getInstance(createWindow);
+// document.getElementById("Id").onclick = function(){
+//     var win = createSingleDiv();
+//     win.style.display ="block";
+// }
+var createSingleIfr = getInstance(createIframe);
+document.getElementById("Id").onclick = function(){
+    var win = createSingleIfr();
+    win.src ="http://www.baidu.com"
+}
+</script>	
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+
+<!-- 使用职责链模式来依次传递对象来实现 -->
+<script type="text/javascript">
+	/*
+	1. orderType(充值类型)，如果值为1的话，说明是充值500元的用户，如果为2的话，说明是充值200元的用户，如果是3的话，说明是没有充值的用户。
+
+	2. isPay(是否已经成功充值了): 如果该值为true的话，说明已经成功充值了，否则的话 说明没有充值成功；就当作普通用户来购买。
+
+	3. count(表示数量)；普通用户抽奖，如果数量有的话，就可以拿到优惠卷，否则的话，不能拿到优惠卷。
+	*/ 
+	function Fn1() {
+	    console.log(1);
+	    return "nextSuccessor";
+	}
+	function Fn2() {
+	    console.log(2);
+	    var self = this;
+	    setTimeout(function(){
+	        self.next();
+	    },1000);
+	}
+	function Fn3() {
+	    console.log(3);
+	}
+
+	function order500(orderType,isPay,count){
+		if(orderType == 1 && isPay == true){
+			console.log("亲爱的用户，您中奖了100元的红包了");
+		}else{
+			return "nextSuccessor";
+		}
+	}
+
+	function order200(orderType,isPay,count){
+		if(orderType == 2 && isPay == true){
+			console.log("亲爱的用户，您中奖了20元的红包了");
+		}else{
+			return "nextSuccessor";
+		}
+	}
+
+	function orderNormal(orderType,isPay,count){
+		if(count > 0 ){
+			console.log('亲爱的用户，您已抽到10元优惠卷');
+		}else{
+			console.log('亲爱的用户，请再接再厉');
+		}
+	}
+
+	//职责模式的封装构造函数方法
+
+	var Chain = function(fn){
+		this.fn  = fn;
+		this.successor = null;
+	};
+
+	Chain.prototype.setNextSuccessor = function(successor){
+		console.log("successor:"+this.successor)
+		return this.successor = successor;
+	};
+
+	Chain.prototype.passRequset = function(){
+		var ret = this.fn.apply(this,arguments);		
+		if(ret == 'nextSuccessor'){
+			return this.successor & this.successor.passRequset.apply(this.successor,arguments);
+		}
+		// console.log(ret+"....")
+		return ret;
+
+	};
+
+	Chain.prototype.next = function(){
+	    return this.successor & this.successor.passRequset.apply(this.successor,arguments);
+	}
+
+	//现在我们把3个函数分别包装成职责链节点：
+	var chainFn1 = new Chain(Fn1);
+	var chainFn2 = new Chain(Fn2);
+	var chainFn3 = new Chain(Fn3);
+
+	// 然后指定节点在职责链中的顺序
+	chainFn1.setNextSuccessor(chainFn2);
+	chainFn2.setNextSuccessor(chainFn3);
+
+	chainFn1.passRequset();  // 打印出1，2 过1秒后 会打印出3
+
+	//调用函数 chainFn1.passRequest();后，会先执行发送者Fn1这个函数 打印出1，然后返回字符串 nextSuccessor;
+
+ 	//接着就执行return this.successor && this.successor.passRequest.apply(this.successor,arguments);这个函数到Fn2，打印2，接着里面有一个setTimeout定时器异步函数，需要把请求给职责链中的下一个节点，因此过一秒后会打印出3;
+
+</script>
+</body>
+</html>

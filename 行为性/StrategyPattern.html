@@ -1,0 +1,79 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+	<P >
+	策略模式的定义是：定义一系列的算法，把它们一个个封装起来，并且使它们可以相互替换
+	</P>
+<script type="text/javascript">
+	/*
+	优点：1. 策略模式利用组合，委托等技术和思想，有效的避免很多if条件语句。
+          2. 策略模式提供了开放-封闭原则，使代码更容易理解和扩展。
+  		  3. 策略模式中的代码可以复用。
+	*/ 
+	/*
+	公司的年终奖是根据员工的工资和绩效来考核的，绩效为A的人，年终奖为工资的4倍，绩效为B的人，年终奖为工资的3倍，绩效为C的人，年终奖为工资的2倍
+	*/
+
+	/*一般编码方式*/ 
+	var calculateBouns = function(salary,level){
+		if(level == 'A'){
+			return salary * 4;
+		}
+		if(level == 'B'){
+			return salary * 3;
+		}
+		if(level == 'C'){
+			return salary * 2;
+		}
+	}
+	console.log(calculateBouns(4000,"A")+"  一般编码")//16000
+	console.log(calculateBouns(1000,"B")+"  一般编码")//3000
+	/*
+	缺点：
+	calculateBouns 函数包含了很多if-else语句。
+	calculateBouns 函数缺乏弹性，假如还有D等级的话，那么我们需要在calculateBouns 函数内添加判断等级D的if语句；
+	算法复用性差，如果在其他的地方也有类似这样的算法的话，但是规则不一样，我们这些代码不能通用
+	*/
+
+
+	/*
+	使用组合函数重构代码
+	组合函数--是把各种算法封装到一个个的小函数里面，比如等级A的话，封装一个小函数，
+	等级为B的话，也封装一个小函数，以此类推
+	*/ 
+	var performanceA = function(salary){
+		return salary * 4;
+	};
+
+	var performanceB = function(salary){
+		return salary * 3;
+	};
+
+	var performanceB = function(salary){
+		return salary * 2;
+	};
+
+	var calculateBounsFunc = function(salary,level){
+		if(level == 'A'){
+			return performanceA(salary);
+		}
+
+		if(level == 'B'){
+			return performanceB(salary);
+		}
+
+		if(level == 'C'){
+			return performanceC(salary);
+		}
+	}
+
+	console.log(calculateBounsFunc(4000,'A')+"  组合函数")//16000
+	//缺点：calculateBouns 函数有可能会越来越大，比如增加D等级的时候，而且缺乏弹性。
+
+</script>
+</body>
+</html>

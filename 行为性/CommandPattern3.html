@@ -1,0 +1,59 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+<button id="button1">刷新菜单目录</button>
+<button id="button2">增加子菜单</button>
+<button id="button3">删除子菜单</button>
+<button id="button4">修改子菜单</button>
+<!-- 使用javascript回调函数 -->
+<script type="text/javascript">
+	/*
+	但是如果我们使用回调函数的话，那么接收者被封闭在回调函数产生的环境中，
+	执行操作将会更加简单，仅仅执行回调函数即可
+	*/
+	var button1 = document.getElementById("button1"),
+		button2 = document.getElementById("button2"),
+		button3 = document.getElementById("button3"),
+		button4 = document.getElementById("button4");
+	/*
+ 		bindEnv函数负责往按钮上面安装点击命令。点击按钮后，会调用函数
+ 	*/
+	var blindEnv = function(button,func){
+		button.onclick = function(){
+			func();
+		}
+	};
+	//现在我们来编写具体处理业务逻辑代码
+	var Todo1 = {
+		test1:function(){
+			alert("我是来做第一个测试的");
+		}
+	};
+
+	//实现业务中增删改操作
+	var Menu = {
+		add:function(){
+			alert("我是来处理一些增加操作的");
+		},
+		del: function(){
+	        alert("我是来处理一些删除操作的");
+	    },
+	    update: function(){
+	        alert("我是来处理一些更新操作的");
+	    }
+	};
+
+	blindEnv(button1,Todo1.test1);
+	blindEnv(button2,Menu.add);
+	blindEnv(button3,Menu.del);
+	blindEnv(button4,Menu.update);
+
+
+</script>
+
+</body>
+</html>

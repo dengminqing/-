@@ -1,0 +1,41 @@
+<!DOCTYPE Html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>extends</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<link href="" rel="stylesheet">
+</head>
+<body>
+
+<script type="text/javascript">	
+
+//理解使用代理实现单列模式的好处
+// 单体模式
+var CreateDiv = function(html) {
+    this.html = html;
+    this.init();
+}
+CreateDiv.prototype.init = function(){
+    var div2 = document.createElement("div");
+    div2.innerHTML = this.html;
+    document.body.appendChild(div2);
+};
+// 代理实现单体模式
+var ProxyMode = (function(){
+    var instance;
+    return function(html) {
+        if(!instance) {
+            instance = new CreateDiv("我来测试下");
+        }
+        return instance;
+    } 
+})();
+var a = new ProxyMode("aaa");
+var b = new ProxyMode("bbb");
+console.log(a===b);// true
+</script>	
+</body>
+</html>

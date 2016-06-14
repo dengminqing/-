@@ -1,0 +1,40 @@
+<!DOCTYPE Html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript">
+	//我们什么时候使用模块模式？如果我们必须创建一个对象并以某些数据进行初始化，同时还要公开一些能够访问这些私有数据的方法，那么我们这个时候就可以使用模块模式了。
+
+	function CustomType(){
+		this.name ="tom";
+	}
+
+	CustomType.prototype.getName = function(){
+		return this.name;
+	}
+
+	var application = (function(){
+		//创建私有变量
+		var privateA ="bb";
+		//创建私有方法
+		function A(){};
+		//实例化一个对象后，返回该实例，然后为实例添加方法和属性
+		var object = new CustomType();
+		//添加共有属性
+		object.A ="aa";
+		//添加共有方法
+		object.B =function(){
+			return privateA;
+		}
+		//返回该对象
+		return object;
+	})();
+	console.log(application.A);
+	console.log(application.B());
+	console.log(application.getName());
+	console.log(application.getName());
+</script>
+</head>
+<body></body>
+</html>

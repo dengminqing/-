@@ -1,0 +1,103 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">	
+</head>
+<body>
+<p>
+模板方法模式由二部分组成，第一部分是抽象父类，第二部分是具体实现的子类，一般的情况下是抽象父类封装了子类的算法框架，包括实现一些公共方法及封装子类中所有方法的执行顺序，子类可以继承这个父类，并且可以在子类中重写父类的方法，从而实现自己的业务逻辑。
+</p>
+<script type="text/javascript">
+	// baidu 笔试
+	var BaiDuInterview = function(){};
+	//百度笔试
+	BaiDuInterview.prototype.writtenTest = function(){
+		console.log("我终于看到百度的笔试题了");
+	};
+	// 技术面试
+	BaiDuInterview.prototype.technicalInterview = function(){
+		console.log("我是百度技术的负责人");
+	};
+
+	//领导面试
+	BaiDuInterview.prototype.leader = function(){
+		console.log("我是百度某部门领导");
+	};
+
+	//等通知
+	BaiDuInterview.prototype.waitNotice = function(){
+		console.log("你面试不通过");
+	};
+
+	//初始化
+	BaiDuInterview.prototype.init = function(){
+		this.writtenTest();
+		this.technicalInterview();
+		this.leader();
+		this.waitNotice();
+	}
+
+	var baiduInterview = new BaiDuInterview();
+	baiduInterview.init();
+
+</script>
+
+<script type="text/javascript">
+	//抽取公用代码
+	var Interview = function(){};
+	//笔试
+	Interview.prototype.writtenTest = function(){
+		console.log("我终于看到笔试题了");
+	};
+	// 技术面试
+	Interview.prototype.technicalInterview = function(){
+		console.log("我是技术的负责人");
+	};
+
+	//领导面试
+	Interview.prototype.leader = function(){
+		console.log("终于看到领导");
+	};
+
+	//等通知
+	Interview.prototype.waitNotice = function(){
+		console.log("你面试不通过");
+	};
+
+	//初始化
+	Interview.prototype.init = function(){
+		this.writtenTest();
+		this.technicalInterview();
+		this.leader();
+		this.waitNotice();
+	}
+
+	var baiduInterview =function(){};
+	baiduInterview.prototype = new Interview();
+	//百度笔试
+	BaiDuInterview.prototype.writtenTest = function(){
+		console.log("我终于看到百度的笔试题了");
+	};
+	// 技术面试
+	BaiDuInterview.prototype.technicalInterview = function(){
+		console.log("我是百度技术的负责人");
+	};
+
+	//领导面试
+	BaiDuInterview.prototype.leader = function(){
+		console.log("我是百度某部门领导");
+	};
+
+	//等通知
+	BaiDuInterview.prototype.waitNotice = function(){
+		console.log("你面试不通过");
+	};
+	var baidu = new BaiDuInterview();
+	baidu.init();
+
+	//对于父类这个方法 Interview.prototype.init() 是模板方法，因为他封装了子类中算法框架，它作为一个算法的模板，指导子类以什么样的顺序去执行代码。在javascript中我认为完全把公用的代码写在父函数内，如果将来业务逻辑需要更改的话，或者说添加新的业务逻辑，我们完全可以使用子类去重写这个父类，这样的话代码可扩展性强，更容易维护
+</script>
+
+</body>
+</html>

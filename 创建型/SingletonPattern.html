@@ -1,0 +1,43 @@
+<!DOCTYPE Html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<script type="text/javascript">	
+/*
+单体模式的优点是：
+
+可以用来划分命名空间，减少全局变量的数量。
+使用单体模式可以使代码组织的更为一致，使代码容易阅读和维护。
+可以被实例化，且实例化一次。
+什么是单体模式？单体模式是一个用来划分命名空间并将一批属性和方法组织在一起的对象，如果它可以被实例化，那么它只能被实例化一次。
+
+*/ 
+
+//Test----我们明白的是单体模式如果有实例化的话，那么只实例化一次，要实现一个单体模式的话，我们无非就是使用一个变量来标识该类是否被实例化，如果未被实例化的话，那么我们可以实例化一次，否则的话，直接返回已经被实例化的对象。
+var Singleton = function(name){
+	this.name = name;
+}
+Singleton.prototype.getName = function(){
+	return this.name;
+}
+var getInstance =(function(){
+	var instance = null;
+	return function(name){
+		if(!instance){
+			instance = new Singleton(name);
+		}
+		return instance;		
+	}
+})();
+
+var a = getInstance("aa");
+var b = getInstance("bb");
+console.log(a === b)//true
+console.log(a.getName());//aa
+console.log(b.getName());//a
+
+</script>
+</head>
+<body></body>
+</html>
